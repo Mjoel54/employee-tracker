@@ -1,15 +1,15 @@
-DROP DATABASE IF EXISTS employee_db;
+DROP DATABASE IF EXISTS staff_db;
 CREATE DATABASE staff_db;
 
-USE employee_db;
+USE staff_db;
 
 CREATE TABLE department (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   name VARCHAR(30) NOT NULL
 );
 
 CREATE TABLE role (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   title VARCHAR(30),
   salary DECIMAL,
   department_id INT,
@@ -19,7 +19,7 @@ CREATE TABLE role (
 );
 
 CREATE TABLE employee (
-  id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   first_name VARCHAR(30),
   last_name VARCHAR(30),
   role_id INT,
