@@ -7,22 +7,20 @@ dotenv.config();
 await connectToDb();
 
 //TODO: Create an array of options for the user to select from
-// const applicationOptions: any = [
-//     {
-//         type: "list",
-//         name: "options",
-//         message: "What would you like to do?",
-//         choices: [
-//             "View all departments",
-//             "View all roles",
-//             "view all employees",
-//             "Add a department",
-//             "Add a role",
-//             "Add an employee",
-//             "Update an employee role",
-//         ]
-//     }
-// ]
+const applicationOptions: any =  {
+  type: "list",
+  name: "options",
+  message: "What would you like to do?",
+  choices: [
+      "View all departments",
+      "View all roles",
+      "view all employees",
+      "Add a department",
+      "Add a role",
+      "Add an employee",
+      "Update an employee role",
+  ]
+};
 
 //
 
@@ -39,29 +37,37 @@ function viewAllDepartments() {
 //TODO: Create a function to initialise the app
 function init() {
     inquirer
-      .prompt(
-        {
-            type: "list",
-            name: "options",
-            message: "What would you like to do?",
-            choices: [
-                "View all departments",
-                "View all roles",
-                "view all employees",
-                "Add a department",
-                "Add a role",
-                "Add an employee",
-                "Update an employee role",
-            ]
-        }
-      )
+      .prompt(applicationOptions)
       .then((answers) => {
         console.log(answers);
-        //Switch statements
-        if (answers.options == "View all departments") {
-            viewAllDepartments();
+        //Actions to perform on user selection
+        switch (answers.options) {
+            case "View all departments":
+          viewAllDepartments();
+          break;
+            case "View all roles":
+          // Function to view all roles
+          break;
+            case "View all employees":
+          // Function to view all employees
+          break;
+            case "Add a department":
+          // Function to add a department
+          break;
+            case "Add a role":
+          // Function to add a role
+          break;
+            case "Add an employee":
+          // Function to add an employee
+          break;
+            case "Update an employee role":
+          // Function to update an employee role
+          break;
+            default:
+          console.log("Invalid option selected");
+          break;
         }
-      })
+        })
       .catch((error) => {
         console.error("Error initializing app: ", error);
       });
