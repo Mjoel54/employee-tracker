@@ -32,6 +32,7 @@ function viewAllDepartments() {
             return;
         }
         console.table(result.rows);
+        init();
     })
 };
 
@@ -42,6 +43,7 @@ function viewAllRoles() {
           return;
       }
       console.table(result.rows);
+      init();
   })
 };
 
@@ -52,6 +54,7 @@ function viewAllEmployees() {
           return;
       }
       console.table(result.rows);
+      init();
   })
 };
 
@@ -65,7 +68,7 @@ function init() {
         switch (answers.options) {
             case "View all departments":
           viewAllDepartments();
-          break;
+           break;
             case "View all roles":
           viewAllRoles();
           break;
