@@ -14,24 +14,45 @@ const applicationOptions: any =  {
   choices: [
       "View all departments",
       "View all roles",
-      "view all employees",
+      "View all employees",
       "Add a department",
       "Add a role",
       "Add an employee",
       "Update an employee role",
+      "Exit"
   ]
 };
 
 //
 
 function viewAllDepartments() {
-    pool.query("SELECT * FROM department", (error, result) => {
+    pool.query("SELECT * FROM departments", (error, result) => {
         if (error) {
             console.error("Error viewing all departments: ", error);
             return;
         }
         console.table(result.rows);
     })
+};
+
+function viewAllRoles() {
+  pool.query("SELECT * FROM roles", (error, result) => {
+      if (error) {
+          console.error("Error viewing all departments: ", error);
+          return;
+      }
+      console.table(result.rows);
+  })
+};
+
+function viewAllEmployees() {
+  pool.query("SELECT * FROM employees", (error, result) => {
+      if (error) {
+          console.error("Error viewing all departments: ", error);
+          return;
+      }
+      console.table(result.rows);
+  })
 };
 
 //TODO: Create a function to initialise the app
@@ -46,10 +67,10 @@ function init() {
           viewAllDepartments();
           break;
             case "View all roles":
-          // Function to view all roles
+          viewAllRoles();
           break;
             case "View all employees":
-          // Function to view all employees
+          viewAllEmployees();
           break;
             case "Add a department":
           // Function to add a department
@@ -62,6 +83,10 @@ function init() {
           break;
             case "Update an employee role":
           // Function to update an employee role
+          break;
+             case "Exit":
+          console.log("Exiting the application.");
+          pool.end(); // Close the database connection gracefully
           break;
             default:
           console.log("Invalid option selected");
