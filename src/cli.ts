@@ -87,6 +87,72 @@ function addDepartment() {
     });
 }
 
+function addRole() {
+  pool.query("SELECT * FROM departments", (error, result) => {
+    if (error) {
+      console.error("Error fetching departments: ", error);
+      return;
+    }
+    const departments = result.rows.map((department) => ({
+      name: department.name,
+      value: department.id,
+    }));
+
+    inquirer
+      .prompt([
+      {
+        type: "input",
+        name: "roleTitle",
+        message: "Enter the title of the new role:",
+      },
+      {
+        type: "input",
+        name: "roleSalary",
+        message: "Enter the salary for the new role:",
+      },
+      {
+        type: "list",
+        name: "departmentId",
+        message: "Select the department for the new role:",
+        choices: departments,
+      },
+      ])
+      .then((answers) => {
+      const { roleTitle, roleSalary, departmentId } = answers;
+      pool.query(
+        "INSERT INTO roles (title, salary, department_id) VALUES ($1, $2, $3) RETURNING *",
+        [roleTitle, roleSalary, departmentId],
+        (error, result) => {
+        if (error) {
+          console.error("Error adding role: ", error);
+          return;
+        }
+        pool.query(
+          `SELECT roles.*, departments.name as department_name 
+           FROM roles 
+           JOIN departments ON roles.department_id = departments.id 
+           WHERE roles.id = $1`,
+          [result.rows[0].id],
+          (error, result) => {
+          if (error) {
+            console.error("Error fetching role with department name: ", error);
+            return;
+          }
+          console.log(`${roleTitle} successfully created!`)
+          console.table(result.rows);
+          init();
+          }
+        );
+        }
+      );
+      })
+      .catch((error) => {
+      console.error("Error adding role: ", error);
+      });
+  });
+}
+
+
 //TODO: Create a function to initialise the app
 function init() {
     inquirer
@@ -106,10 +172,9 @@ function init() {
           break;
             case "Add a department":
           addDepartment();
-          // Function to add a department
           break;
             case "Add a role":
-          // Function to add a role
+          addRole();
           break;
             case "Add an employee":
           // Function to add an employee
