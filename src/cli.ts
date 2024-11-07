@@ -58,6 +58,35 @@ function viewAllEmployees() {
   })
 };
 
+function addDepartment() {
+  inquirer
+    .prompt([
+      {
+        type: "input",
+        name: "departmentName",
+        message: "Enter the name of the new department:",
+      },
+    ])
+    .then((answers) => {
+      const { departmentName } = answers;
+      pool.query(
+        "INSERT INTO departments (name) VALUES ($1) RETURNING *",
+        [departmentName],
+        (error, result) => {
+          if (error) {
+            console.error("Error adding department: ", error);
+            return;
+          }
+          console.log("Department added successfully:", result.rows[0]);
+          init();
+        }
+      );
+    })
+    .catch((error) => {
+      console.error("Error adding department: ", error);
+    });
+}
+
 //TODO: Create a function to initialise the app
 function init() {
     inquirer
@@ -76,6 +105,7 @@ function init() {
           viewAllEmployees();
           break;
             case "Add a department":
+          addDepartment();
           // Function to add a department
           break;
             case "Add a role":
