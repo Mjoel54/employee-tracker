@@ -13,10 +13,14 @@ CREATE TABLE roles (
   title VARCHAR(30),
   salary DECIMAL,
   department_id INT,
+  department_name VARCHAR(30),
   FOREIGN KEY (department_id)
   REFERENCES departments(id)
   ON DELETE SET NULL
 );
+
+
+
 
 CREATE TABLE employees (
   id SERIAL PRIMARY KEY,
