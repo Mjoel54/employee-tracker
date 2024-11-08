@@ -8,9 +8,7 @@ INSERT INTO roles (title, salary, department_id) VALUES
 ('HR Manager', 60000, 2),
 ('Marketing Specialist', 50000, 3);
 
-INSERT INTO employees (first_name, last_name, role_id, manager_id) VALUES 
-('John', 'Doe', 1, NULL),
-('Jane', 'Smith', 2, NULL),
-('Emily', 'Jones', 3, NULL),
-('Michael', 'Brown', 1, 1),
-('Sarah', 'Davis', 3, 3);
+INSERT INTO employees (first_name, last_name, role_id, manager_name) VALUES
+('John', 'Doe', 1, 'Jane Smith'),
+('Alice', 'Johnson', 2, 'John Doe'),
+('Bob', 'Brown', 3, 'Alice Johnson');

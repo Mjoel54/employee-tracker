@@ -38,7 +38,7 @@ function viewAllDepartments() {
 
 function viewAllRoles() {
   pool.query(
-    `SELECT roles.*, departments.name as department_name 
+    `SELECT roles.id, roles.title, roles.salary, departments.name as department_name 
      FROM roles 
      JOIN departments ON roles.department_id = departments.id`,
     (error, result) => {
@@ -53,15 +53,21 @@ function viewAllRoles() {
 }
 
 function viewAllEmployees() {
-  pool.query("SELECT * FROM employees", (error, result) => {
+  pool.query(
+    `SELECT employees.id, employees.first_name, employees.last_name, roles.title AS job_title, departments.name AS department, roles.salary, employees.manager_name
+    FROM employees 
+    LEFT JOIN roles ON employees.role_id = roles.id 
+    LEFT JOIN departments ON roles.department_id = departments.id`,
+    (error, result) => {
       if (error) {
-          console.error("Error viewing all departments: ", error);
-          return;
+        console.error("Error viewing all employees: ", error);
+        return;
       }
-      console.table(result.rows);
+      console.table(result.rows, ["id", "first_name", "last_name", "job_title", "department", "salary", "manager_name"]);
       init();
-  })
-};
+    }
+  );
+}
 
 function addDepartment() {
   inquirer
@@ -158,6 +164,63 @@ function addRole() {
 }
 
 
+function addEmployee() {
+  pool.query("SELECT * FROM roles", (error, result) => {
+    if (error) {
+      console.error("Error fetching roles: ", error);
+      return;
+    }
+    const roles = result.rows.map((role) => ({
+      name: role.title,
+      value: role.id,
+    }));
+
+    inquirer
+      .prompt([
+        {
+          type: "input",
+          name: "firstName",
+          message: "Enter the first name of the new employee:",
+        },
+        {
+          type: "input",
+          name: "lastName",
+          message: "Enter the last name of the new employee:",
+        },
+        {
+          type: "list",
+          name: "roleId",
+          message: "Select the role for the new employee:",
+          choices: roles,
+        },
+        {
+          type: "input",
+          name: "managerName",
+          message: "Enter the manager's name for the new employee:",
+        },
+      ])
+      .then((answers) => {
+        const { firstName, lastName, roleId, managerName } = answers;
+        pool.query(
+          "INSERT INTO employees (first_name, last_name, role_id, manager_name) VALUES ($1, $2, $3, $4) RETURNING *",
+          [firstName, lastName, roleId, managerName],
+          (error, result) => {
+            if (error) {
+              console.error("Error adding employee: ", error);
+              return;
+            }
+            console.log("Employee added successfully:", result.rows[0]);
+            init();
+          }
+        );
+      })
+      .catch((error) => {
+        console.error("Error adding employee: ", error);
+      });
+  });
+}
+
+
 //TODO: Create a function to initialise the app
 function init() {
     inquirer
@@ -182,6 +245,7 @@ function init() {
           addRole();
           break;
             case "Add an employee":
+          addEmployee();
           // Function to add an employee
           break;
             case "Update an employee role":
