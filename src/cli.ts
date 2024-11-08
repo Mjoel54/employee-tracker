@@ -37,15 +37,20 @@ function viewAllDepartments() {
 };
 
 function viewAllRoles() {
-  pool.query("SELECT * FROM roles", (error, result) => {
+  pool.query(
+    `SELECT roles.*, departments.name as department_name 
+     FROM roles 
+     JOIN departments ON roles.department_id = departments.id`,
+    (error, result) => {
       if (error) {
-          console.error("Error viewing all departments: ", error);
-          return;
+        console.error("Error viewing all roles: ", error);
+        return;
       }
       console.table(result.rows);
       init();
-  })
-};
+    }
+  );
+}
 
 function viewAllEmployees() {
   pool.query("SELECT * FROM employees", (error, result) => {
