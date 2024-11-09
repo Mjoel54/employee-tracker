@@ -2,9 +2,12 @@
 import inquirer from "inquirer";
 import dotenv from "dotenv";
 import { pool, connectToDb } from "./connection.js";
+import chalk from 'chalk';
 dotenv.config();
 
 await connectToDb();
+
+const title: string = `EMPLOYEE TRACKER`;
 
 //TODO: Create an array of options for the user to select from
 const applicationOptions: any =  {
@@ -220,6 +223,102 @@ function addEmployee() {
   });
 }
 
+function updateEmployeeRole() {
+  pool.query("SELECT * FROM employees", (error, result) => {
+    if (error) {
+      console.error("Error fetching employees: ", error);
+      return;
+    }
+    const employees = result.rows.map((employee) => ({
+      name: `${employee.first_name} ${employee.last_name}`,
+      value: employee.id,
+    }));
+
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "employeeId",
+          message: "Select the employee whose role you want to update:",
+          choices: employees,
+        },
+      ])
+      .then((answers) => {
+        const { employeeId } = answers;
+        pool.query(
+          `SELECT employees.first_name, employees.last_name, roles.title AS current_role 
+           FROM employees 
+           JOIN roles ON employees.role_id = roles.id 
+           WHERE employees.id = $1`,
+          [employeeId],
+          (error, result) => {
+            if (error) {
+              console.error("Error fetching current role: ", error);
+              return;
+            }
+            const employee = result.rows[0];
+            console.log(`Current role of ${employee.first_name} ${employee.last_name}: ${employee.current_role}`);
+
+            pool.query("SELECT * FROM roles", (error, result) => {
+              if (error) {
+                console.error("Error fetching roles: ", error);
+                return;
+              }
+              const roles = result.rows.map((role) => ({
+                name: role.title,
+                value: role.id,
+              }));
+
+              inquirer
+                .prompt([
+                  {
+                    type: "list",
+                    name: "roleId",
+                    message: "Select the new role for the employee:",
+                    choices: roles,
+                  },
+                ])
+                .then((answers) => {
+                  const { roleId } = answers;
+                  pool.query(
+                    "UPDATE employees SET role_id = $1 WHERE id = $2 RETURNING *",
+                    [roleId, employeeId],
+                    (error, result) => {
+                      if (error) {
+                        console.error("Error updating employee role: ", error);
+                        return;
+                      }
+                      const updatedEmployee = result.rows[0];
+                      pool.query(
+                        "SELECT title FROM roles WHERE id = $1",
+                        [roleId],
+                        (error, result) => {
+                          if (error) {
+                            console.error("Error fetching new role title: ", error);
+                            init();
+                            return;
+                          }
+                          const newRole = result.rows[0].title;
+                          console.log(`Employee ${updatedEmployee.first_name} ${updatedEmployee.last_name}'s role updated successfully from ${employee.current_role} to ${newRole}`);
+                          init();
+                        }
+                      );
+                    }
+                  );
+                })
+                .catch((error) => {
+                  console.error("Error updating employee role: ", error);
+                });
+            });
+          }
+        );
+      })
+      .catch((error) => {
+        console.error("Error fetching employee: ", error);
+      });
+  });
+}
+
 
 //TODO: Create a function to initialise the app
 function init() {
@@ -246,11 +345,10 @@ function init() {
           break;
             case "Add an employee":
           addEmployee();
-          // Function to add an employee
           break;
             case "Update an employee role":
-          // Function to update an employee role
-          break;
+          updateEmployeeRole();
+            break;
              case "Exit":
           console.log("Exiting the application.");
           pool.end(); // Close the database connection gracefully
@@ -266,4 +364,6 @@ function init() {
   }
 
 //TODO: Function call to initialise the app
+console.log(chalk.bgGreenBright(`${title}`));
+console.log(chalk.greenBright(`This application will store data in the ${process.env.DB_NAME} database for user ${process.env.DB_USER}.`));
 init();
