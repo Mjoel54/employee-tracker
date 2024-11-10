@@ -1,14 +1,12 @@
 # Employee Tracker
 
-# Vehicle Generator
-
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 ## Description
 
 Manage your company's employee database with ease with the Employee Tracker command-line application.
 
-Tutorial video:
+Tutorial video: https://bootcampspot.instructuremedia.com/embed/1f83df35-506c-4f1b-8d79-9dc5f510944f
 
 ## Table of Contents
 
@@ -60,12 +58,6 @@ Insert dummy data into the staff_db database
 
 ```
 \i db/seeds.sql
-```
-
-Connect to the staff_db database within the psql terminal
-
-```
-\c staff_db
 ```
 
 ## Usage
