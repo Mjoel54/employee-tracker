@@ -28,3 +28,8 @@ CREATE TABLE employees (
   REFERENCES roles(id)
   ON DELETE SET NULL
 );
+
+INSERT INTO employees (first_name, last_name, role_id, manager_name) VALUES
+('John', 'Doe', 1, 'Jane Smith'),
+('Alice', 'Johnson', 2, 'John Doe'),
+('Bob', 'Brown', 3, 'Alice Johnson');
